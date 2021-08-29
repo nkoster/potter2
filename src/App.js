@@ -1,11 +1,16 @@
 import React from 'react'
 import './App.css'
+import { useState } from 'react'
+import Login from './pages/Login'
+import NewPodcast from './pages/NewPodcast'
 
-const App = () => {
+const App = _ => {
+
+  const [tokens, setTokens] = useState({})
+
   return (
     <div className='App'>
-      <h3>App</h3>
-      <img src='../assets/blacksquare.svg' />
+      {tokens.accessToken ? <NewPodcast setTokens={setTokens}/> : <Login setTokens={setTokens}/>}
     </div>
   )
 }
