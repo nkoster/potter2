@@ -31,6 +31,7 @@ const Login = ({setTokens}) => {
         setErr(true)
         return
       }
+      localStorage.setItem('potterTokens', JSON.stringify(tokens))
       setTokens(tokens)
     })
     .catch(err => {
