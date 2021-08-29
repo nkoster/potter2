@@ -57,7 +57,6 @@ const App = _ => {
   return (
     <div className='App'>
       {tokens.accessToken ? <NewPodcast setTokens={setTokens}/> : <Login setTokens={setTokens}/>}
-      <h3>{tokens.accessToken}</h3>
     </div>
   )
 }
