@@ -3,6 +3,7 @@ import './App.css'
 import { useState, useEffect } from 'react'
 import Login from './pages/Login'
 import NewPodcast from './pages/NewPodcast'
+import '@fontsource/roboto'
 
 const App = _ => {
 
