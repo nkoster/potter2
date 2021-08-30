@@ -17,34 +17,35 @@ const App = _ => {
     }
     try {
       tokens = JSON.parse(tokens)
-      if (tokens.accessToken) {
-        fetch('https://auth.w3b.net/verify', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            token: tokens.accessToken
-          })
-        })
-        .then(res => res.json())
-        .then(res => {
-          console.log('Valid token')
-          if (res.result)
-            setTokens(tokens)
-          else
-            localStorage.removeItem('potterTokens')
-          setLoading(false)
-        })
-        .catch(err => {
-          setLoading(false)
-          console.log(err.message)
-        })
-      }
     } catch(err) {
       setLoading(false)
-      console.log(err)
+      return
+    }
+    if (tokens.accessToken) {
+      fetch('https://auth.w3b.net/verify', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          token: tokens.accessToken
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.result) {
+          console.log('Valid token')
+          setTokens(tokens)
+        } else {
+          localStorage.removeItem('potterTokens')
+        }
+        setLoading(false)
+      })
+      .catch(err => {
+        setLoading(false)
+        console.log(err.message)
+      })
     }
   }, [])
 
