@@ -36,7 +36,6 @@ const App = _ => {
       .then(res => res.json())
       .then(res => {
         if (res.result) {
-          console.log('Valid token')
           setTokens(tokens)
         } else {
           localStorage.removeItem('potterTokens')
@@ -58,7 +57,12 @@ const App = _ => {
 
   return (
     <div className='App'>
-      {tokens.accessToken ? <NewPodcast setTokens={setTokens}/> : <Login setTokens={setTokens}/>}
+      {tokens.accessToken
+        ? <NewPodcast
+            setTokens={setTokens}
+            accessToken={tokens.accessToken}
+          />
+        : <Login setTokens={setTokens}/>}
     </div>
   )
 }
