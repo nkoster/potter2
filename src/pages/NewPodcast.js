@@ -1,9 +1,11 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Button, Fab } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import refresh from '../utils/refresh'
 
 const NewPodcast = ({tokens, setTokens}) => {
+
+  const active = useRef(false)
 
   const logout = _ => {
     localStorage.removeItem('potterTokens')
@@ -19,7 +21,7 @@ const NewPodcast = ({tokens, setTokens}) => {
   const handleFileInput = evt => {
     setMp3(evt.target.files[0].name)
     setSelected(true)
-    refresh(tokens, setTokens)
+    active.current = true
   }
 
   const formSubmit = async evt => {
@@ -47,8 +49,17 @@ const NewPodcast = ({tokens, setTokens}) => {
     setUploading(false)
     setMp3('')
     setSelected(false)
-    refresh(tokens, setTokens)
+    active.current = true
   }
+
+  useEffect(_ => {
+    setInterval(_ => {
+      if (active.current) {
+        active.current = false
+        refresh(tokens, setTokens)
+      }
+    }, 30000)
+  }, [])
 
   return (
     <>
