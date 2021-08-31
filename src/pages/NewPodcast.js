@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react'
 import { Button, Fab } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 
-const NewPodcast = ({setTokens}) => {
+const NewPodcast = ({setTokens, accessToken}) => {
 
   const logout = _ => {
     localStorage.removeItem('potterTokens')
@@ -12,20 +12,24 @@ const NewPodcast = ({setTokens}) => {
   const [mp3, setMp3] = useState()
   const [selected, setSelected] = useState(false)
   const [uploaded, setUploaded] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const mp3Ref = useRef()
 
   const handleFileInput = evt => {
-    console.log(mp3Ref.current.files[0])
     setMp3(evt.target.files[0].name)
     setSelected(true)
   }
 
   const formSubmit = async evt => {
     evt.preventDefault()
+    setUploading(true)
     const data = new FormData()
     const mp3data = mp3Ref.current.files[0]
     data.append('file', mp3data)
     const res = await fetch('https://uploader.w3b.net/uploader', {
+      headers: new Headers({
+        'Authorization': `bearer ${accessToken}`
+      }),
       method: 'POST',
       body: data
     })
@@ -36,12 +40,16 @@ const NewPodcast = ({setTokens}) => {
     if (res.status) {
       setUploaded(true)
     }
+    setUploading(false)
+    setMp3('')
+    setSelected(false)
   }
 
   return (
     <>
       <h3>Upload</h3>
-      {uploaded ? <p>File has been uploaded</p> :
+      {uploaded && !uploading && <p>Last upload was successful</p>}
+      {uploading ? <p>Uploading<br />{mp3}</p> :
       <form onSubmit={formSubmit} method='POST' encType='multipart/form-data'>
       <label>
         <input
@@ -58,11 +66,11 @@ const NewPodcast = ({setTokens}) => {
         {mp3}
       </label>
       <p>
-        <Button type='submit' color='primary' variant='contained' disabled={!selected}>Submit</Button>
+        <Button type='submit' color='primary' variant='outlined' disabled={!selected}>Submit</Button>
       </p>
       </form>}
       <p>
-        <Button color='secondary' variant='contained' component='span' onClick={logout}>logout</Button>
+        <Button color='secondary' variant='outlined' component='span' onClick={logout}>logout</Button>
       </p>
     </>
   )
