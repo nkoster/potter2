@@ -60,7 +60,7 @@ const App = _ => {
       {tokens.accessToken
         ? <NewPodcast
             setTokens={setTokens}
-            accessToken={tokens.accessToken}
+            tokens={tokens}
           />
         : <Login setTokens={setTokens}/>}
     </div>
