@@ -11,18 +11,8 @@ const NewPodcast = ({setTokens}) => {
 
   const [mp3, setMp3] = useState()
   const [selected, setSelected] = useState(false)
+  const [uploaded, setUploaded] = useState(false)
   const mp3Ref = useRef()
-
-  const formSubmit = evt => {
-    evt.preventDefault()
-    const data = new FormData()
-    const mp3data = mp3Ref.current.files[0]
-    data.append('file', mp3data)
-    fetch('https://uploader.w3b.net/uploader', {
-      method: 'POST',
-      body: data
-    })
-  }
 
   const handleFileInput = evt => {
     console.log(mp3Ref.current.files[0])
@@ -30,9 +20,28 @@ const NewPodcast = ({setTokens}) => {
     setSelected(true)
   }
 
+  const formSubmit = async evt => {
+    evt.preventDefault()
+    const data = new FormData()
+    const mp3data = mp3Ref.current.files[0]
+    data.append('file', mp3data)
+    const res = await fetch('https://uploader.w3b.net/uploader', {
+      method: 'POST',
+      body: data
+    })
+    .then(res => res.json())
+    .catch(err => {
+      console.log(err.message)
+    })
+    if (res.status) {
+      setUploaded(true)
+    }
+  }
+
   return (
     <>
-      <h3>upload a new podcast</h3>
+      <h3>Upload</h3>
+      {uploaded ? <p>File has been uploaded</p> :
       <form onSubmit={formSubmit} method='POST' encType='multipart/form-data'>
       <label>
         <input
@@ -42,16 +51,16 @@ const NewPodcast = ({setTokens}) => {
           type='file'
           onChange={handleFileInput}
         />
-        Choose an mp3 file
+        Choose a file
         <Fab style={{margin: 10}} color='default' size='small' component='span' aria-label='add'>
             <AddIcon />
         </Fab>
         {mp3}
       </label>
       <p>
-        <Button type='submit' color='primary' variant='contained'>Submit</Button>
+        <Button type='submit' color='primary' variant='contained' disabled={!selected}>Submit</Button>
       </p>
-      </form>
+      </form>}
       <p>
         <Button color='secondary' variant='contained' component='span' onClick={logout}>logout</Button>
       </p>
