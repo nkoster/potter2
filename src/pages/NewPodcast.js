@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react'
 import { Button, Fab } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
+import refresh from '../utils/refresh'
 
-const NewPodcast = ({setTokens, accessToken}) => {
+const NewPodcast = ({tokens, setTokens}) => {
 
   const logout = _ => {
     localStorage.removeItem('potterTokens')
@@ -18,6 +19,7 @@ const NewPodcast = ({setTokens, accessToken}) => {
   const handleFileInput = evt => {
     setMp3(evt.target.files[0].name)
     setSelected(true)
+    refresh(tokens, setTokens)
   }
 
   const formSubmit = async evt => {
@@ -28,7 +30,7 @@ const NewPodcast = ({setTokens, accessToken}) => {
     data.append('file', mp3data)
     const res = await fetch('https://uploader.w3b.net/uploader', {
       headers: new Headers({
-        'Authorization': `bearer ${accessToken}`
+        'Authorization': `bearer ${tokens.accessToken}`
       }),
       method: 'POST',
       body: data
@@ -45,6 +47,7 @@ const NewPodcast = ({setTokens, accessToken}) => {
     setUploading(false)
     setMp3('')
     setSelected(false)
+    refresh(tokens, setTokens)
   }
 
   return (
@@ -72,7 +75,7 @@ const NewPodcast = ({setTokens, accessToken}) => {
       </p>
       </form>}
       <p>
-        <Button color='secondary' variant='outlined' component='span' onClick={logout}>logout</Button>
+        {!uploading && <Button color='secondary' variant='outlined' component='span' onClick={logout}>logout</Button>}
       </p>
     </>
   )
