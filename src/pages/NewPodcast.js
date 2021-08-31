@@ -39,6 +39,8 @@ const NewPodcast = ({setTokens, accessToken}) => {
     })
     if (res.status) {
       setUploaded(true)
+    } else {
+      if (res.error) return logout()
     }
     setUploading(false)
     setMp3('')
