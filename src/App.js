@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Login from './pages/Login'
 import NewPodcast from './pages/NewPodcast'
 import '@fontsource/roboto'
@@ -9,6 +9,8 @@ const App = _ => {
 
   const [tokens, setTokens] = useState({})
   const [loading, setLoading] = useState(true)
+
+  const inactive = useRef(false)
 
   useEffect(_ => {
     let tokens = localStorage.getItem('potterTokens')
@@ -56,13 +58,17 @@ const App = _ => {
   )
 
   return (
-    <div className='App'>
+    <div className='App-header'>
       {tokens.accessToken
         ? <NewPodcast
             setTokens={setTokens}
             tokens={tokens}
+            inactive={inactive}
           />
-        : <Login setTokens={setTokens}/>}
+        : <Login
+            setTokens={setTokens}
+            inactive={inactive}
+          />}
     </div>
   )
 }
