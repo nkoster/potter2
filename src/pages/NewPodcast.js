@@ -1,26 +1,65 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { Button, Fab } from '@material-ui/core'
-import AddIcon from '@material-ui/icons/Add'
-import refresh from '../utils/refresh'
+import React, { useRef, useEffect, useState } from 'react'
+import { Button, Fab, TextField } from '@material-ui/core'
+import { MuiPickersUtilsProvider, DateTimePicker } from '@material-ui/pickers'
+import DateFnsUtils from '@date-io/date-fns'
 
-const NewPodcast = ({tokens, setTokens}) => {
+import refresh from '../utils/refresh'
+const TEN_MINUTES = 600000
+const TEN_SECONDS = 10000
+import { makeStyles } from '@material-ui/core/styles'
+
+const NewPodcast = ({tokens, setTokens, inactive}) => {
 
   const active = useRef(false)
+  const logoutTime = useRef(Date.now() + TEN_MINUTES)
+  const interval = useRef()
 
   const logout = _ => {
     localStorage.removeItem('potterTokens')
+    clearInterval(interval.current)
     setTokens({})
   }
 
   const [mp3, setMp3] = useState()
+  const [jpg, setJpg] = useState()
+  const [png, setPng] = useState()
+  const mp3Ref = useRef()
+  const jpgRef = useRef()
+  const pngRef = useRef()
+
   const [selected, setSelected] = useState(false)
   const [uploaded, setUploaded] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const mp3Ref = useRef()
 
-  const handleFileInput = evt => {
+  const [potterTitle, setPotterTitle] = useState('')
+  const [potterAuthor, setPotterAuthor] = useState('')
+  const [potterSubtitle, setPotterSubtitle] = useState('')
+  const [potterKeywords, setPotterKeywords] = useState('')
+  const [potterReleaseDate, setPotterReleaseDate] = useState(new Date())
+
+  const [potterFacebook, setPotterFacebook] = useState('')
+  const [potterInstagram, setPotterInstagram] = useState('')
+  const [potterSoundcloud, setPotterSoundcloud] = useState('')
+  const [potterTwitter, setPotterTwitter] = useState('')
+  const [potterMixcloud, setPotterMixcloud] = useState('')
+  const [potterRA, setPotterRA] = useState('')
+  const [potterBeatport, setPotterBeatport] = useState('')
+  const [potterBandcamp, setPotterBandcamp] = useState('')
+
+  const classes = useStyles()
+
+  const handleMp3FileInput = evt => {
     setMp3(evt.target.files[0].name)
-    setSelected(true)
+    active.current = true
+  }
+
+  const handleJpgFileInput = evt => {
+    setJpg(evt.target.files[0].name)
+    active.current = true
+  }
+
+  const handlePngFileInput = evt => {
+    setPng(evt.target.files[0].name)
     active.current = true
   }
 
@@ -53,43 +92,203 @@ const NewPodcast = ({tokens, setTokens}) => {
   }
 
   useEffect(_ => {
-    setInterval(_ => {
+    interval.current = setInterval(_ => {
+      if (Date.now() > logoutTime.current) {
+        console.log('Inactive, logging out')
+        inactive.current = true
+        logout()
+      }
       if (active.current) {
         active.current = false
+        logoutTime.current = Date.now() + TEN_MINUTES
         refresh(tokens, setTokens)
       }
-    }, 30000)
+    }, TEN_SECONDS)
   }, [])
 
   return (
-    <>
-      <h3>Upload</h3>
+    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <>
+      <h5>NEW PODCAST</h5>
       {uploaded && !uploading && <p>Last upload was successful</p>}
       {uploading ? <p>Uploading<br />{mp3}</p> :
-      <form onSubmit={formSubmit} method='POST' encType='multipart/form-data'>
-      <label>
-        <input
-          ref={mp3Ref}
-          style={{ display: 'none' }}
-          name='file'
-          type='file'
-          onChange={handleFileInput}
+      <div>
+        <form onSubmit={formSubmit} method='POST' encType='multipart/form-data' style={{width: '75vw'}}>
+        <p className={classes.title} style={{marginBottom: '16px', marginTop: '-20px'}}>FILES</p>
+        <label style={{fontSize: '18px'}}>
+          <input
+            ref={mp3Ref}
+            style={{ display: 'none' }}
+            name='mp3File'
+            type='file'
+            onChange={handleMp3FileInput}
+          />
+          <Fab style={{margin: 10}} color='default' size='small' component='span' aria-label='add'>
+              MP3
+          </Fab>
+          {mp3 && <>{mp3}<br /></>}
+        </label>
+        <label style={{fontSize: '18px'}}>
+          <input
+            ref={jpgRef}
+            style={{ display: 'none' }}
+            name='jpgFile'
+            type='file'
+            onChange={handleJpgFileInput}
+          />
+          <Fab style={{margin: 10}} color='default' size='small' component='span' aria-label='add'>
+              JPG
+          </Fab>
+          {jpg && <>{jpg}<br /></>}
+        </label>
+        <label style={{fontSize: '18px'}}>
+          <input
+            ref={pngRef}
+            style={{ display: 'none' }}
+            name='pngFile'
+            type='file'
+            onChange={handlePngFileInput}
+          />
+          <Fab style={{margin: 10}} color='default' size='small' component='span' aria-label='add'>
+              PNG
+          </Fab>
+          {png && <>{png}<br /></>}
+        </label>
+        <p className={classes.title} >INFO</p>
+        <TextField
+          type='text'
+          name='potterTitle'
+          label='Title'
+          onChange={evt => { active.current = true; setPotterTitle(evt.target.value)}}
+          value={potterTitle}
+          className={classes.textField}
         />
-        Choose a file
-        <Fab style={{margin: 10}} color='default' size='small' component='span' aria-label='add'>
-            <AddIcon />
-        </Fab>
-        {mp3}
-      </label>
+        <TextField
+          type='text'
+          name='potterAuthor'
+          label='Author'
+          onChange={evt => { active.current = true; setPotterAuthor(evt.target.value)}}
+          value={potterAuthor}
+          className={classes.textField}
+        />
+        <TextField
+          type='text'
+          name='potterSubtitle'
+          label='Subtitle'
+          onChange={evt => { active.current = true; setPotterSubtitle(evt.target.value)}}
+          value={potterSubtitle}
+          className={classes.textField}
+        />
+        <TextField
+          type='text'
+          name='potterKeywords'
+          label='Keywords'
+          onChange={evt => { active.current = true; setPotterKeywords(evt.target.value)}}
+          value={potterKeywords}
+          className={classes.textField}
+        />
+        <DateTimePicker
+          value={potterReleaseDate}
+          disablePast
+          onChange={dateTime => { active.current = true; setPotterReleaseDate(dateTime)}}
+          label='Release Date'
+          showTodayButton
+          format='dd-MM-yyyy HH:mm'
+          className={classes.textField}
+        />
+        <p className={classes.title}>LINKS</p>
+        <TextField
+          type='text'
+          name='potterFacebook'
+          label='Facebook'
+          onChange={evt => { active.current = true; setPotterFacebook(evt.target.value)}}
+          value={potterFacebook}
+          className={classes.textField}
+        />
+        <TextField
+          type='text'
+          name='potterInstagram'
+          label='Instagram'
+          onChange={evt => { active.current = true; setPotterInstagram(evt.target.value)}}
+          value={potterInstagram}
+          className={classes.textField}
+        />
+        <TextField
+          type='text'
+          name='potterSoundcloud'
+          label='Soundcloud'
+          onChange={evt => { active.current = true; setPotterSoundcloud(evt.target.value)}}
+          value={potterSoundcloud}
+          className={classes.textField}
+        />
+        <TextField
+          type='text'
+          name='potterTwitter'
+          label='Twitter'
+          onChange={evt => { active.current = true; setPotterTwitter(evt.target.value)}}
+          value={potterTwitter}
+          className={classes.textField}
+        />
+        <TextField
+          type='text'
+          name='potterMixcloud'
+          label='Mixcloud'
+          onChange={evt => { active.current = true; setPotterMixcloud(evt.target.value)}}
+          value={potterMixcloud}
+          className={classes.textField}
+        />
+        <TextField
+          type='text'
+          name='potterRA'
+          label='Resident Advisor'
+          onChange={evt => { active.current = true; setPotterRA(evt.target.value)}}
+          value={potterRA}
+          className={classes.textField}
+        />
+        <TextField
+          type='text'
+          name='potterBeatport'
+          label='Beatport'
+          onChange={evt => { active.current = true; setPotterBeatport(evt.target.value)}}
+          value={potterBeatport}
+          className={classes.textField}
+        />
+        <TextField
+          type='text'
+          name='potterBandcamp'
+          label='Bandcamp'
+          onChange={evt => { active.current = true; setPotterBandcamp(evt.target.value)}}
+          value={potterBandcamp}
+          className={classes.textField}
+        />
+        <p style={{textAlign: 'right'}}>
+          <Button type='submit' color='primary' variant='outlined' disabled={!!selected} style={{marginTop: '30px'}}>Submit</Button>
+        </p>
+        </form>
+      </div>}
       <p>
-        <Button type='submit' color='primary' variant='outlined' disabled={!selected}>Submit</Button>
-      </p>
-      </form>}
-      <p>
-        {!uploading && <Button color='secondary' variant='outlined' component='span' onClick={logout}>logout</Button>}
+        {!uploading && <Button color='primary' variant='outlined' component='span' onClick={logout} className={classes.logout}>logout</Button>}
       </p>
     </>
+    </MuiPickersUtilsProvider>
   )
 }
+
+const useStyles = makeStyles({
+  title: {
+    marginBottom: '1px',
+    marginTop: '50px',
+    background: 'none',
+    fontSize: '16px'
+  },
+  textField: {
+    margin: '14px'
+  },
+  logout: {
+    position: 'absolute',
+    top: '20px',
+    right: '20px'
+  }
+})
 
 export default NewPodcast
