@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState } from 'react'
 import { Button, Fab, TextField } from '@material-ui/core'
 import { MuiPickersUtilsProvider, DateTimePicker } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
+import Popover from '@material-ui/core/Popover'
+import Typography from '@material-ui/core/Typography'
 
 import refresh from '../utils/refresh'
 const TEN_MINUTES = 600000
@@ -47,6 +49,38 @@ const NewPodcast = ({tokens, setTokens, inactive}) => {
   const [potterBandcamp, setPotterBandcamp] = useState('')
 
   const classes = useStyles()
+
+  const [anchorElMp3, setAnchorElMp3] = useState(null)
+  const [anchorElJpg, setAnchorElJpg] = useState(null)
+  const [anchorElPng, setAnchorElPng] = useState(null)
+
+  const handlePopoverOpenMp3 = evt => {
+    setAnchorElMp3(evt.currentTarget)
+  }
+
+  const handlePopoverCloseMp3 = _ => {
+    setAnchorElMp3(null)
+  }
+
+  const handlePopoverOpenJpg = evt => {
+    setAnchorElJpg(evt.currentTarget)
+  }
+
+  const handlePopoverCloseJpg = _ => {
+    setAnchorElJpg(null)
+  }
+
+  const handlePopoverOpenPng = evt => {
+    setAnchorElPng(evt.currentTarget)
+  }
+
+  const handlePopoverClosePng = _ => {
+    setAnchorElPng(null)
+  }
+
+  const openMp3 = Boolean(anchorElMp3)
+  const openJpg = Boolean(anchorElJpg)
+  const openPng = Boolean(anchorElPng)
 
   const handleMp3FileInput = evt => {
     setMp3(evt.target.files[0].name)
@@ -124,7 +158,35 @@ const NewPodcast = ({tokens, setTokens, inactive}) => {
             onChange={handleMp3FileInput}
           />
           <Fab style={{margin: 10}} color='default' size='small' component='span' aria-label='add'>
-              MP3
+            <Typography
+              aria-owns={openMp3 ? 'mouse-over-popover-mp3' : undefined}
+              aria-haspopup='true'
+              onMouseEnter={handlePopoverOpenMp3}
+              onMouseLeave={handlePopoverCloseMp3}
+            >
+              <span style={{fontSize: '12px'}}>MP3</span>
+            </Typography>
+            <Popover
+              id='mouse-over-popover-mp3'
+              className={classes.popover}
+              classes={{
+                paper: classes.paper,
+              }}
+              open={openMp3}
+              anchorEl={anchorElMp3}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              onClose={handlePopoverCloseMp3}
+              disableRestoreFocus
+            >
+              <Typography>Select MP3 file with correct meta data</Typography>
+            </Popover>
           </Fab>
           {mp3 && <>{mp3}<br /></>}
         </label>
@@ -137,7 +199,35 @@ const NewPodcast = ({tokens, setTokens, inactive}) => {
             onChange={handleJpgFileInput}
           />
           <Fab style={{margin: 10}} color='default' size='small' component='span' aria-label='add'>
-              JPG
+            <Typography
+              aria-owns={openJpg ? 'mouse-over-popover-jpg' : undefined}
+              aria-haspopup='true'
+              onMouseEnter={handlePopoverOpenJpg}
+              onMouseLeave={handlePopoverCloseJpg}
+            >
+              <span style={{fontSize: '12px'}}>JPG</span>
+            </Typography>
+            <Popover
+              id='mouse-over-popover-jpg'
+              className={classes.popover}
+              classes={{
+                paper: classes.paper,
+              }}
+              open={openJpg}
+              anchorEl={anchorElJpg}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              onClose={handlePopoverCloseJpg}
+              disableRestoreFocus
+            >
+              <Typography>Select JPG 1400x1400</Typography>
+            </Popover>
           </Fab>
           {jpg && <>{jpg}<br /></>}
         </label>
@@ -150,7 +240,35 @@ const NewPodcast = ({tokens, setTokens, inactive}) => {
             onChange={handlePngFileInput}
           />
           <Fab style={{margin: 10}} color='default' size='small' component='span' aria-label='add'>
-              PNG
+            <Typography
+              aria-owns={openPng ? 'mouse-over-popover-png' : undefined}
+              aria-haspopup='true'
+              onMouseEnter={handlePopoverOpenPng}
+              onMouseLeave={handlePopoverClosePng}
+            >
+              <span style={{fontSize: '12px'}}>PNG</span>
+            </Typography>
+            <Popover
+              id='mouse-over-popover-png'
+              className={classes.popover}
+              classes={{
+                paper: classes.paper,
+              }}
+              open={openPng}
+              anchorEl={anchorElPng}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              onClose={handlePopoverClosePng}
+              disableRestoreFocus
+            >
+              <Typography>Select PNG 300x300</Typography>
+            </Popover>
           </Fab>
           {png && <>{png}<br /></>}
         </label>
@@ -274,7 +392,7 @@ const NewPodcast = ({tokens, setTokens, inactive}) => {
   )
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   title: {
     marginBottom: '1px',
     marginTop: '50px',
@@ -288,7 +406,13 @@ const useStyles = makeStyles({
     position: 'absolute',
     top: '20px',
     right: '20px'
+  },
+  popover: {
+    pointerEvents: 'none',
+  },
+  paper: {
+    padding: theme.spacing(1),
   }
-})
+}))
 
 export default NewPodcast
